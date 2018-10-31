@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - '8'
+  - '10'
+  - 'node'
+script:
+  - npm run format-check
+  - npm run lint
+  - npm test
+  - npm run build
+after_script:
+  - npm run coveralls
