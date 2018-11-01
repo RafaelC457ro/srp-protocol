@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" --write \"test/**/*.ts\"",
     "format-check": "prettier-check \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "tslint -p . --fix -t stylish",
-    "test": "jest",
+    "test": "karma start --single-run",
     "build": "microbundle build --sourcemap false --target browser",
     "coverage": "npm run spec -- --coverage",
     "coveralls": "npm run coverage && cat coverage/lcov.info | coveralls",
@@ -36,14 +36,18 @@
   },
   "homepage": "https://github.com/thiamsantos/srp-protocol#readme",
   "devDependencies": {
-    "@types/jest": "^23.3.9",
     "coveralls": "^3.0.2",
-    "jest": "^23.6.0",
+    "jasmine-core": "^3.3.0",
+    "karma": "^3.1.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.2",
+    "karma-firefox-launcher": "^1.1.0",
+    "karma-jasmine": "^1.1.2",
+    "karma-typescript": "^3.0.13",
     "microbundle": "^0.7.0",
     "prettier": "^1.14.3",
     "prettier-check": "^2.0.0",
     "rimraf": "^2.6.2",
-    "ts-jest": "^23.10.4",
     "tslint": "^5.11.0",
     "tslint-microsoft-contrib": "^5.2.1",
     "typescript": "^3.1.4"
@@ -59,18 +63,5 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist"
-  ],
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ]
-  }
+  ]
 }
