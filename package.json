@@ -13,7 +13,7 @@
     "lint": "tslint -p . --fix -t stylish",
     "lint-check": "tslint -p . -t stylish",
     "test": "karma start --single-run",
-    "build": "microbundle build --sourcemap false --target browser",
+    "build": "microbundle build --sourcemap false --target browser --external none",
     "coveralls": "npm test && cat \"$(find coverage/*/lcov.info -print -quit)\" | coveralls",
     "clean": "rimraf dist",
     "prepublish": "npm run clean && npm run format-check && npm run lint-check && npm test && npm run build"
@@ -70,5 +70,8 @@
     "hooks": {
       "pre-commit": "npm run prepublish"
     }
+  },
+  "dependencies": {
+    "big-integer": "^1.6.36"
   }
 }
