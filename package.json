@@ -13,7 +13,7 @@
     "lint": "tslint -p . --fix -t stylish",
     "test": "karma start --single-run",
     "build": "microbundle build --sourcemap false --target browser",
-    "coveralls": "npm test && find coverage/*/lcov.info -print -quit | coveralls",
+    "coveralls": "npm test && cat \"$(find coverage/*/lcov.info -print -quit)\" | coveralls",
     "clean": "rimraf dist",
     "prepublish": "npm run clean && npm run format-check && npm run lint && npm test && npm run build"
   },
