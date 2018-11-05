@@ -53,7 +53,7 @@ export class Srp {
             const {prime, generator} = getGroup(primeSize);
             const salt = randomSalt();
 
-            hash(hashAlgorithm, `${username}|${password}`)
+            hash(hashAlgorithm, `${username}:${password}`)
                 .then((hashIdentity: string) =>
                     hash(hashAlgorithm, salt + hashIdentity)
                 )
