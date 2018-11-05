@@ -1,6 +1,6 @@
 import {BigInteger, default as bigInt} from 'big-integer';
 
-interface Group {
+export interface Group {
     prime: BigInteger;
     generator: BigInteger;
 }
@@ -167,8 +167,21 @@ const groups = {
     }
 };
 
-export function getGroup(primeSize: string): Group {
-    const {prime: primeHex, generator} = groups[primeSize];
+const suportedPrimes: Array<Number> = [
+    1024,
+    1536,
+    2048,
+    3072,
+    4096,
+    6144,
+    8192
+];
+
+export function getGroup(primeSize: number): Group {
+    if (!suportedPrimes.includes(primeSize)) {
+        throw new Error('Invalid prime size');
+    }
+    const {prime: primeHex, generator} = groups[primeSize.toString()];
     const primeInt = primeHex.replace(/\s|\n/g, '');
     const prime = bigInt(primeInt, 16);
     return {prime, generator: bigInt(generator)};

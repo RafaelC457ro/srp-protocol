@@ -2,7 +2,7 @@ import {Srp} from '../src/index';
 
 describe('srp', () => {
     it('should return 42', done => {
-        const srp = new Srp({hashAlgorithm: 'SHA-1', primeSize: '1024'});
+        const srp = new Srp({hashAlgorithm: 'SHA-1', primeSize: 1024});
 
         const verifier = srp.generateVerifier({
             username: 'rafael',
@@ -11,12 +11,13 @@ describe('srp', () => {
 
         verifier
             .then(verifier => {
-                console.log(verifier);
+                //console.log(verifier);
+                return srp.serverKeyPair(verifier.verifier);
+            })
+            .then(keyPair => {
+                console.log(keyPair);
                 expect('42').toBe('42');
                 done();
-            })
-            .catch(err => {
-                console.log(err);
             });
     });
 });
