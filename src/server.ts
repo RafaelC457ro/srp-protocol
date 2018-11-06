@@ -1,8 +1,20 @@
+import {BigInteger, default as bigInt} from 'big-integer';
+import {hash, randomSalt} from './crypto';
+import {Group} from './groups';
+import {Config} from './config';
+import {KeyPair} from './keypair';
+
 export class Server {
-    constructor() {}
+    private config: Config;
+    constructor(config: Config) {
+        this.config = config;
+    }
     public serverKeyPair(passwordVerifier: string): PromiseLike<KeyPair> {
-        const {hashAlgorithm, primeSize} = this.config;
-        const {prime, generator}: Group = getGroup(primeSize);
+        const hashAlgorithm = this.config.getHashAlgorith();
+        const primeSize = this.config.getPrimeSize();
+        const group = new Group(primeSize);
+        const prime = group.getPrime();
+        const generator = group.getGenerator();
         const privateKey = randomSalt();
 
         return hash(
