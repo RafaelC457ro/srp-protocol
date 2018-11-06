@@ -1,10 +1,5 @@
 import {BigInteger, default as bigInt} from 'big-integer';
 
-export interface Group {
-    prime: BigInteger;
-    generator: BigInteger;
-}
-
 const groups = {
     '1024': {
         prime: `
@@ -167,22 +162,28 @@ const groups = {
     }
 };
 
-const suportedPrimes: Array<Number> = [
-    1024,
-    1536,
-    2048,
-    3072,
-    4096,
-    6144,
-    8192
-];
+export class Group {
+    private prime: BigInteger;
+    private generator: BigInteger;
+    private primeLength: number;
 
-export function getGroup(primeSize: number): Group {
-    if (!suportedPrimes.includes(primeSize)) {
-        throw new Error('Invalid prime size');
+    constructor(primeSize: number) {
+        const {prime: primeHex, generator} = groups[primeSize.toString()];
+        const primeInt = primeHex.replace(/\s|\n/g, '');
+        this.prime = bigInt(primeInt, 16);
+        this.generator = bigInt(generator);
+        this.primeLength = this.prime.toString().length;
     }
-    const {prime: primeHex, generator} = groups[primeSize.toString()];
-    const primeInt = primeHex.replace(/\s|\n/g, '');
-    const prime = bigInt(primeInt, 16);
-    return {prime, generator: bigInt(generator)};
+
+    public getPrime(): BigInteger {
+        return this.prime;
+    }
+
+    public getGenerator(): BigInteger {
+        return this.generator;
+    }
+
+    public getPrimeLength(): number {
+        return this.primeLength;
+    }
 }
