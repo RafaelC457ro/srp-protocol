@@ -20,7 +20,7 @@ export class Client {
     }
 
     public generateVerifier(): PromiseLike<Verifier> {
-        const hashAlgorithm = this.config.getHashAlgorith();
+        const hashAlgorithm = this.config.getHashAlgorithm();
         const primeSize = this.config.getPrimeSize();
         const group = new Group(primeSize);
         const prime = group.getPrime();

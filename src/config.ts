@@ -36,7 +36,7 @@ export class Config {
         return this.primeSize;
     }
 
-    public getHashAlgorith(): string {
+    public getHashAlgorithm(): string {
         return this.hashAlgorithm;
     }
 }
