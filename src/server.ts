@@ -1,16 +1,16 @@
 import {BigInteger, default as bigInt} from 'big-integer';
+import leftPad from 'left-pad';
 import {hash, randomSalt} from './crypto';
 import {Group} from './groups';
 import {Config} from './config';
 import {KeyPair} from './keypair';
-import leftPad from 'left-pad';
 
 export class Server {
     private config: Config;
-    private passwordVerifier: string;
+    private passwordVerifier: BigInteger;
     constructor(passwordVerifier: string, config: Config) {
         this.config = config;
-        this.passwordVerifier = passwordVerifier;
+        this.passwordVerifier = bigInt(passwordVerifier);
     }
 
     public generateKeyPair(): PromiseLike<KeyPair> {
@@ -35,17 +35,27 @@ export class Server {
         });
     }
 
-    public generatePremasterSecret(clientPublicKey: string, keyPair: KeyPair) {
+    public generatePremasterSecret(
+        clientPublicKeyString: string,
+        keyPair: KeyPair
+    ): PromiseLike<string> {
         const hashAlgorithm = this.config.getHashAlgorithm();
         const primeSize = this.config.getPrimeSize();
         const group = new Group(primeSize);
         const prime = group.getPrime();
-        const generator = group.getGenerator();
         const primeLenght = group.getPrimeLength();
-        const scrambling = hash(
+        const passwordVerifier = this.passwordVerifier;
+        const clientPublicKey = bigInt(clientPublicKeyString);
+        return hash(
             hashAlgorithm,
-            leftPad(clientPublicKey, primeLenght) +
+            leftPad(clientPublicKeyString, primeLenght) +
                 leftPad(keyPair.public, primeLenght)
-        );
+        ).then((scramblingHash: string) => {
+            const scrambling = bigInt(scramblingHash, 16);
+            return clientPublicKey
+                .multiply(passwordVerifier.modPow(scrambling, prime))
+                .modPow(bigInt(keyPair.private), prime)
+                .toString();
+        });
     }
 }

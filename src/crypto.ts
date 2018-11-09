@@ -6,7 +6,7 @@ export function randomSalt(): string {
     return bigInt(random, 16).toString();
 }
 
-export function hash(hashAlgorithm: string, text: string): PromiseLike<String> {
+export function hash(hashAlgorithm: string, text: string): PromiseLike<string> {
     const buffer = new TextEncoder().encode(text);
     return crypto.subtle
         .digest(hashAlgorithm, buffer)
