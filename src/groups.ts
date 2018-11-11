@@ -1,7 +1,7 @@
 import {BigInteger, default as bigInt} from 'big-integer';
 
 const groups = {
-    '1024': {
+    1024: {
         prime: `
             EEAF0AB9 ADB38DD6 9C33F80A FA8FC5E8 60726187 75FF3C0B 9EA2314C
             9C256576 D674DF74 96EA81D3 383B4813 D692C6E0 E0D5D8E2 50B98BE4
@@ -11,7 +11,7 @@ const groups = {
         `,
         generator: 2
     },
-    '1536': {
+    1536: {
         prime: `
             9DEF3CAF B939277A B1F12A86 17A47BBB DBA51DF4 99AC4C80 BEEEA961
             4B19CC4D 5F4F5F55 6E27CBDE 51C6A94B E4607A29 1558903B A0D0F843
@@ -24,7 +24,7 @@ const groups = {
         generator: 2
     },
 
-    '2048': {
+    2048: {
         prime: `
             AC6BDB41 324A9A9B F166DE5E 1389582F AF72B665 1987EE07 FC319294
             3DB56050 A37329CB B4A099ED 8193E075 7767A13D D52312AB 4B03310D
@@ -40,7 +40,7 @@ const groups = {
         generator: 2
     },
 
-    '3072': {
+    3072: {
         prime: `
             FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08
             8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD EF9519B3 CD3A431B
@@ -59,7 +59,7 @@ const groups = {
         `,
         generator: 5
     },
-    '4096': {
+    4096: {
         prime: `
             FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08
             8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD EF9519B3 CD3A431B
@@ -84,7 +84,7 @@ const groups = {
         generator: 5
     },
 
-    '6144': {
+    6144: {
         prime: `
             FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08
             8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD EF9519B3 CD3A431B
@@ -118,7 +118,7 @@ const groups = {
         generator: 5
     },
 
-    '8192': {
+    8192: {
         prime: `
             FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08
             8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD EF9519B3 CD3A431B

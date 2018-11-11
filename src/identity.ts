@@ -6,10 +6,10 @@ export class Identity {
         this.password = password;
     }
 
-    getUserName(): string {
+    public getUserName(): string {
         return this.username;
     }
-    getPassWord(): string {
+    public getPassWord(): string {
         return this.password;
     }
 }

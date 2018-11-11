@@ -1,9 +1,9 @@
 import {BigInteger, default as bigInt} from 'big-integer';
 import leftPad from 'left-pad';
+import {Config} from './config';
 import {hash, randomSalt} from './crypto';
 import {Group} from './groups';
 import {Identity} from './identity';
-import {Config} from './config';
 import {KeyPair} from './keypair';
 
 interface Verifier {
@@ -36,11 +36,10 @@ export class Client {
             .then((hashIdentity: string) =>
                 hash(hashAlgorithm, salt + hashIdentity)
             )
-            .then((xHash: string) => {
-                const x: BigInteger = bigInt(xHash, 16);
-                const {remainder: verifier} = generator
-                    .modPow(x, prime)
-                    .divmod(prime);
+            .then((credentials: string) => {
+                console.log(credentials);
+                const x = bigInt(credentials, 16);
+                const verifier = generator.modPow(x, prime);
 
                 return {
                     username: this.identity.getUserName(),
@@ -66,7 +65,23 @@ export class Client {
         });
     }
 
-    public generatePremasterSecret(
+    public proof(
+        clientKeyPair: KeyPair,
+        serverPublicKey: string
+    ): PromiseLike<string> {
+        return this.generatePreMasterSecret(
+            clientKeyPair,
+            serverPublicKey
+        ).then(premasterSecret =>
+            this.generateClientProof(
+                clientKeyPair.public,
+                serverPublicKey,
+                premasterSecret
+            )
+        );
+    }
+
+    private generatePreMasterSecret(
         keypair: KeyPair,
         serverPublicKey: string
     ): Promise<string> {
@@ -82,13 +97,13 @@ export class Client {
 
         const scramblingPromise = hash(
             hashAlgorithm,
-            leftPad(keypair.public, primeLenght) +
-                leftPad(serverPublicKey, primeLenght)
+            leftPad(keypair.public, primeLenght, '0') +
+                leftPad(serverPublicKey, primeLenght, '0')
         );
 
         const multiplierPromise = hash(
             hashAlgorithm,
-            prime.toString() + leftPad(generator.toString(), primeLenght)
+            prime.toString() + leftPad(generator.toString(), primeLenght, '0')
         );
 
         const credentialsPromise = hash(
@@ -103,14 +118,13 @@ export class Client {
             multiplierPromise,
             credentialsPromise
         ]).then(
-            ([scramblingHash, multiplierHash, credentialsHash]: Array<
-                string
-            >) => {
+            ([scramblingHash, multiplierHash, credentialsHash]: string[]) => {
                 const credentials = bigInt(credentialsHash, 16);
                 const multiplier = bigInt(multiplierHash, 16);
                 const serverPublicKeyInt = bigInt(serverPublicKey);
                 const scrambling = bigInt(scramblingHash, 16);
                 const keyPairPrivate = bigInt(keypair.private);
+
                 return generator
                     .modPow(credentials, prime)
                     .multiply(multiplier)
@@ -121,6 +135,22 @@ export class Client {
                     )
                     .toString();
             }
+        );
+    }
+
+    private generateClientProof(
+        clientPublicKey: string,
+        serverPublicKey: string,
+        premasterSecret: string
+    ): PromiseLike<string> {
+        const hashAlgorithm = this.config.getHashAlgorithm();
+
+        return hash(hashAlgorithm, premasterSecret).then(
+            (premasterSecretHash: string) =>
+                hash(
+                    hashAlgorithm,
+                    clientPublicKey + serverPublicKey + premasterSecretHash
+                )
         );
     }
 }

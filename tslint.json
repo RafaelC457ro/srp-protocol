@@ -5,6 +5,7 @@
     "missing-jsdoc": [false],
     "no-relative-imports": [false],
     "no-increment-decrement": [false],
-    "export-name": [false]
+    "export-name": [false],
+    "interface-name":[false]
   }
 }

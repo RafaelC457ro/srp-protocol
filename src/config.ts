@@ -1,4 +1,4 @@
-const suportedPrimes: Array<Number> = [
+const suportedPrimes: Number[] = [
     1024,
     1536,
     2048,
@@ -8,7 +8,7 @@ const suportedPrimes: Array<Number> = [
     8192
 ];
 
-const suportedHashAlgorith: Array<string> = [
+const suportedHashAlgorith: string[] = [
     'SHA-1', // (not supported by Microsoft Edge)
     'SHA-256',
     'SHA-384',

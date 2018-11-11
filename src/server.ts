@@ -1,8 +1,8 @@
 import {BigInteger, default as bigInt} from 'big-integer';
 import leftPad from 'left-pad';
+import {Config} from './config';
 import {hash, randomSalt} from './crypto';
 import {Group} from './groups';
-import {Config} from './config';
 import {KeyPair} from './keypair';
 
 export class Server {
@@ -19,11 +19,13 @@ export class Server {
         const group = new Group(primeSize);
         const prime = group.getPrime();
         const generator = group.getGenerator();
+        const primeLength = group.getPrimeLength();
         const privateKey = randomSalt();
-        const passwordVerifier = bigInt(this.passwordVerifier);
+        const passwordVerifier = this.passwordVerifier;
+
         return hash(
             hashAlgorithm,
-            prime.toString() + generator.toString()
+            prime.toString() + leftPad(generator.toString(), primeLength, '0')
         ).then((multiplierHash: string) => {
             const publicKey = bigInt(multiplierHash, 16)
                 .times(passwordVerifier)
@@ -35,8 +37,41 @@ export class Server {
         });
     }
 
-    public generatePremasterSecret(
-        clientPublicKeyString: string,
+    public proof(
+        clientProof: string,
+        keyPair: KeyPair,
+        clientPublicKey: string
+    ) {
+        return this.generatePreMasterSecret(clientPublicKey, keyPair).then(
+            preMasterKey =>
+                this.generateServerProof(
+                    clientProof,
+                    clientPublicKey,
+                    preMasterKey
+                )
+        );
+    }
+
+    public isClientValidProof(
+        clientProof: string,
+        keyPair: KeyPair,
+        clientPublicKey
+    ): PromiseLike<boolean> {
+        return this.generatePreMasterSecret(clientPublicKey, keyPair)
+            .then(preMasterSecret => {
+                return this.generateServerProof(
+                    clientPublicKey,
+                    keyPair.public,
+                    preMasterSecret
+                );
+            })
+            .then(proof => {
+                return clientProof === proof;
+            });
+    }
+
+    private generatePreMasterSecret(
+        clientPublicKey: string,
         keyPair: KeyPair
     ): PromiseLike<string> {
         const hashAlgorithm = this.config.getHashAlgorithm();
@@ -45,17 +80,34 @@ export class Server {
         const prime = group.getPrime();
         const primeLenght = group.getPrimeLength();
         const passwordVerifier = this.passwordVerifier;
-        const clientPublicKey = bigInt(clientPublicKeyString);
+        const clientPublicKeyInt = bigInt(clientPublicKey);
+
         return hash(
             hashAlgorithm,
-            leftPad(clientPublicKeyString, primeLenght) +
-                leftPad(keyPair.public, primeLenght)
+            leftPad(clientPublicKey, primeLenght, '0') +
+                leftPad(keyPair.public, primeLenght, '0')
         ).then((scramblingHash: string) => {
             const scrambling = bigInt(scramblingHash, 16);
-            return clientPublicKey
+            const privateKey = bigInt(keyPair.private);
+            return clientPublicKeyInt
                 .multiply(passwordVerifier.modPow(scrambling, prime))
-                .modPow(bigInt(keyPair.private), prime)
+                .modPow(privateKey, prime)
                 .toString();
         });
+    }
+
+    private generateServerProof(
+        clientProof: string,
+        clientPublicKey: string,
+        premasterSecret: string
+    ) {
+        const hashAlgorithm = this.config.getHashAlgorithm();
+        return hash(hashAlgorithm, premasterSecret).then(
+            (premasterSecretHash: string) =>
+                hash(
+                    hashAlgorithm,
+                    clientPublicKey + clientProof + premasterSecretHash
+                )
+        );
     }
 }
