@@ -20,14 +20,17 @@ export class Server {
         const prime = group.getPrime();
         const generator = group.getGenerator();
         const primeLength = group.getPrimeLength();
-        const privateKey = randomSalt();
+        const privateKey = bigInt(randomSalt().toString('hex'), 16);
         const passwordVerifier = this.passwordVerifier;
 
         return hash(
             hashAlgorithm,
-            prime.toString() + leftPad(generator.toString(), primeLength, '0')
-        ).then((multiplierHash: string) => {
-            const publicKey = bigInt(multiplierHash, 16)
+            new Buffer(
+                prime.toString() +
+                    leftPad(generator.toString(), primeLength, '0')
+            )
+        ).then((multiplierHash: Buffer) => {
+            const publicKey = bigInt(multiplierHash.toString('hex'), 16)
                 .times(passwordVerifier)
                 .add(generator.modPow(privateKey, prime));
             return {
@@ -84,10 +87,12 @@ export class Server {
 
         return hash(
             hashAlgorithm,
-            leftPad(clientPublicKey, primeLenght, '0') +
-                leftPad(keyPair.public, primeLenght, '0')
-        ).then((scramblingHash: string) => {
-            const scrambling = bigInt(scramblingHash, 16);
+            new Buffer(
+                leftPad(clientPublicKey, primeLenght, '0') +
+                    leftPad(keyPair.public, primeLenght, '0')
+            )
+        ).then((scramblingHash: Buffer) => {
+            const scrambling = bigInt(scramblingHash.toString('hex'), 16);
             const privateKey = bigInt(keyPair.private);
             return clientPublicKeyInt
                 .multiply(passwordVerifier.modPow(scrambling, prime))
@@ -100,14 +105,19 @@ export class Server {
         clientProof: string,
         clientPublicKey: string,
         premasterSecret: string
-    ) {
+    ): PromiseLike<string> {
         const hashAlgorithm = this.config.getHashAlgorithm();
-        return hash(hashAlgorithm, premasterSecret).then(
-            (premasterSecretHash: string) =>
+        return hash(hashAlgorithm, new Buffer(premasterSecret))
+            .then((premasterSecretHash: Buffer) =>
                 hash(
                     hashAlgorithm,
-                    clientPublicKey + clientProof + premasterSecretHash
+                    new Buffer(
+                        clientPublicKey +
+                            clientProof +
+                            premasterSecretHash.toString('hex')
+                    )
                 )
-        );
+            )
+            .then(buffer => buffer.toString('hex'));
     }
 }

@@ -35,6 +35,10 @@ describe('srp', () => {
             .then(isValid => {
                 expect(isValid).toBeTruthy();
                 done();
+            })
+            .catch(err => {
+                console.log(err);
+                done();
             });
     });
 });

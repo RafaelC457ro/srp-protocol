@@ -15,7 +15,7 @@ interface Verifier {
 export class Client {
     private identity: Identity;
     private config: Config;
-    private salt: string;
+    private salt: Buffer;
     constructor(identity: Identity, config: Config) {
         this.identity = identity;
         this.config = config;
@@ -32,18 +32,17 @@ export class Client {
         const username = this.identity.getUserName();
         const password = this.identity.getPassWord();
 
-        return hash(hashAlgorithm, `${username}:${password}`)
-            .then((hashIdentity: string) =>
-                hash(hashAlgorithm, salt + hashIdentity)
+        return hash(hashAlgorithm, new Buffer(`${username}:${password}`))
+            .then((identity: Buffer) =>
+                hash(hashAlgorithm, Buffer.concat([salt, identity]))
             )
-            .then((credentials: string) => {
-                console.log(credentials);
-                const x = bigInt(credentials, 16);
+            .then((credentials: Buffer) => {
+                const x = bigInt(credentials.toString('hex'), 16);
                 const verifier = generator.modPow(x, prime);
 
                 return {
                     username: this.identity.getUserName(),
-                    salt,
+                    salt: bigInt(salt.toString('hex'), 16).toString(),
                     verifier: verifier.toString()
                 };
             });
@@ -57,10 +56,13 @@ export class Client {
         const privateKey = randomSalt();
 
         return new Promise(resolve => {
-            const publicKey = generator.modPow(privateKey, prime);
+            const publicKey = generator.modPow(
+                bigInt(privateKey.toString('hex'), 16),
+                prime
+            );
             resolve({
                 public: publicKey.toString(),
-                private: privateKey.toString()
+                private: bigInt(privateKey.toString('hex'), 16).toString()
             });
         });
     }
@@ -72,7 +74,7 @@ export class Client {
         return this.generatePreMasterSecret(
             clientKeyPair,
             serverPublicKey
-        ).then(premasterSecret =>
+        ).then((premasterSecret: string) =>
             this.generateClientProof(
                 clientKeyPair.public,
                 serverPublicKey,
@@ -97,20 +99,25 @@ export class Client {
 
         const scramblingPromise = hash(
             hashAlgorithm,
-            leftPad(keypair.public, primeLenght, '0') +
-                leftPad(serverPublicKey, primeLenght, '0')
+            new Buffer(
+                leftPad(keypair.public, primeLenght, '0') +
+                    leftPad(serverPublicKey, primeLenght, '0')
+            )
         );
 
         const multiplierPromise = hash(
             hashAlgorithm,
-            prime.toString() + leftPad(generator.toString(), primeLenght, '0')
+            new Buffer(
+                prime.toString() +
+                    leftPad(generator.toString(), primeLenght, '0')
+            )
         );
 
         const credentialsPromise = hash(
             hashAlgorithm,
-            `${username}:${password}`
-        ).then((hashIdentity: string) =>
-            hash(hashAlgorithm, salt + hashIdentity)
+            new Buffer(`${username}:${password}`)
+        ).then((identity: Buffer) =>
+            hash(hashAlgorithm, Buffer.concat([salt, identity]))
         );
 
         return Promise.all([
@@ -118,13 +125,13 @@ export class Client {
             multiplierPromise,
             credentialsPromise
         ]).then(
-            ([scramblingHash, multiplierHash, credentialsHash]: string[]) => {
-                const credentials = bigInt(credentialsHash, 16);
-                const multiplier = bigInt(multiplierHash, 16);
+            ([scramblingHash, multiplierHash, credentialsHash]: Buffer[]) => {
+                const credentials = bigInt(credentialsHash.toString('hex'), 16);
+                const multiplier = bigInt(multiplierHash.toString('hex'), 16);
                 const serverPublicKeyInt = bigInt(serverPublicKey);
-                const scrambling = bigInt(scramblingHash, 16);
+                const scrambling = bigInt(scramblingHash.toString('hex'), 16);
                 const keyPairPrivate = bigInt(keypair.private);
-
+                console.log(multiplierHash.toString('hex'));
                 return generator
                     .modPow(credentials, prime)
                     .multiply(multiplier)
@@ -145,12 +152,16 @@ export class Client {
     ): PromiseLike<string> {
         const hashAlgorithm = this.config.getHashAlgorithm();
 
-        return hash(hashAlgorithm, premasterSecret).then(
-            (premasterSecretHash: string) =>
+        return hash(hashAlgorithm, new Buffer(premasterSecret)).then(
+            (premasterSecretHash: Buffer) =>
                 hash(
                     hashAlgorithm,
-                    clientPublicKey + serverPublicKey + premasterSecretHash
-                )
+                    new Buffer(
+                        clientPublicKey +
+                            serverPublicKey +
+                            premasterSecretHash.toString('hex')
+                    )
+                ).then(buffer => buffer.toString('hex'))
         );
     }
 }
