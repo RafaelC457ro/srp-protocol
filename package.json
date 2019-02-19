@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" --write \"test/**/*.ts\"",
     "format-check": "prettier-check \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "tslint -p . -t stylish -c tslint.json -e \"test/**/*.ts\"",
-    "lint-check": "tslint -p . -t stylish -c tslint.json",
+    "lint-check": "tslint -p . -t stylish -c tslint.json -e \"test/**/*.ts\"",
     "test": "karma start --single-run",
     "build": "microbundle build --sourcemap false --target browser --external none",
     "coveralls": "npm test && cat \"$(find coverage/*/lcov.info -print -quit)\" | coveralls",
