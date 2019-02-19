@@ -1,6 +1,15 @@
 import {BigInteger, default as bigInt} from 'big-integer';
 
-const groups = {
+interface PrimeGroup {
+    prime: string;
+    generator: number;
+}
+
+interface Groups {
+    [primeSize: number]: PrimeGroup;
+}
+
+const groups: Groups = {
     1024: {
         prime: `
             EEAF0AB9 ADB38DD6 9C33F80A FA8FC5E8 60726187 75FF3C0B 9EA2314C
@@ -59,6 +68,7 @@ const groups = {
         `,
         generator: 5
     },
+
     4096: {
         prime: `
             FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 29024E08
@@ -163,16 +173,17 @@ const groups = {
 };
 
 export class Group {
-    private prime: BigInteger;
-    private generator: BigInteger;
-    private primeLength: number;
+    private readonly prime: BigInteger;
+    private readonly generator: BigInteger;
+    private readonly primeBin: Buffer;
 
     constructor(primeSize: number) {
-        const {prime: primeHex, generator} = groups[primeSize.toString()];
-        const primeInt = primeHex.replace(/\s|\n/g, '');
-        this.prime = bigInt(primeInt, 16);
+        const {prime, generator}: {prime: string; generator: number} = groups[
+            primeSize
+        ];
+        this.prime = bigInt(prime.replace(/\s|\n/g, ''), 16);
         this.generator = bigInt(generator);
-        this.primeLength = this.prime.toString().length;
+        this.primeBin = Buffer.from(this.prime.toArray(16).value);
     }
 
     public getPrime(): BigInteger {
@@ -183,7 +194,7 @@ export class Group {
         return this.generator;
     }
 
-    public getPrimeLength(): number {
-        return this.primeLength;
+    public getPrimeBinaryLength(): number {
+        return this.primeBin.length;
     }
 }

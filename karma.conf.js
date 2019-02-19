@@ -21,7 +21,7 @@ module.exports = function(config) {
             'test/**/*.ts': ['karma-typescript']
         },
         reporters: ['progress', 'karma-typescript', 'coverage'],
-        browsers: ['ChromeHeadless', 'FirefoxHeadless'],
+        browsers: ['FirefoxHeadless', 'ChromeHeadless'],
         coverageReporter: {
             reporters: [{type: 'text-summary'}, {type: 'lcovonly'}]
         }

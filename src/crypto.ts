@@ -1,7 +1,7 @@
 export function randomSalt(): Buffer {
-    // const array: Uint8Array = new Uint8Array(32);
-    // const random: Buffer = Buffer.from(crypto.getRandomValues(array));
-    return Buffer.from('BEB25379D1A8581EB5A727673A2441EE', 'hex');
+    const array: Uint8Array = new Uint8Array(32);
+
+    return Buffer.from(crypto.getRandomValues(array));
 }
 
 export function hash(
@@ -10,5 +10,5 @@ export function hash(
 ): PromiseLike<Buffer> {
     return crypto.subtle
         .digest(hashAlgorithm, buffer)
-        .then(hash => Buffer.from(hash));
+        .then((hashBin: ArrayBuffer) => Buffer.from(hashBin));
 }

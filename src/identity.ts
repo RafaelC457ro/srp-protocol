@@ -1,6 +1,6 @@
 export class Identity {
-    private username: string;
-    private password: string;
+    private readonly username: string;
+    private readonly password: string;
     constructor(username: string, password: string) {
         this.username = username;
         this.password = password;

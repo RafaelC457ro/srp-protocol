@@ -8,8 +8,8 @@ const suportedHashAlgorith: string[] = [
 ];
 
 export class Config {
-    private primeSize: number;
-    private hashAlgorithm: string;
+    private readonly primeSize: number;
+    private readonly hashAlgorithm: string;
 
     constructor(primeSize: number, hashAlgorithm: string) {
         if (!suportedPrimes.includes(primeSize)) {
