@@ -1,6 +1,6 @@
 {
   "defaultSeverity": "error",
-  "extends": ["tslint-microsoft-contrib"],
+  "extends": ["tslint:recommended"],
   "linterOptions": {
     "exclude": [
         "test/*/**.ts"
@@ -14,6 +14,10 @@
     "no-relative-imports": [false],
     "no-increment-decrement": [false],
     "export-name": [false],
-    "interface-name":[false]
+    "interface-name":[false],
+    "quotemark":[false],
+    "trailing-comma":[false],
+    "arrow-parens": [false],
+    "object-literal-sort-keys": [false]
   }
 }

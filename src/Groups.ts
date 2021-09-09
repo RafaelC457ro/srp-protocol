@@ -1,4 +1,5 @@
-import {BigInteger, default as bigInt} from 'big-integer';
+import {BigInteger, default as bigInt} from "big-integer";
+import {Crypto} from "./Crypto";
 
 interface PrimeGroup {
     prime: string;
@@ -176,14 +177,16 @@ export class Group {
     private readonly prime: BigInteger;
     private readonly generator: BigInteger;
     private readonly primeBin: Buffer;
+    private readonly crypto: Crypto;
 
     constructor(primeSize: number) {
         const {prime, generator}: {prime: string; generator: number} = groups[
             primeSize
         ];
-        this.prime = bigInt(prime.replace(/\s|\n/g, ''), 16);
+        this.crypto = new Crypto();
+        this.prime = bigInt(prime.replace(/\s|\n/g, ""), 16);
         this.generator = bigInt(generator);
-        this.primeBin = Buffer.from(this.prime.toArray(16).value);
+        this.primeBin = this.crypto.bigNumberToBuffer(this.prime);
     }
 
     public getPrime(): BigInteger {

@@ -1,10 +1,10 @@
-const suportedPrimes: Number[] = [1024, 1536, 2048, 3072, 4096, 6144, 8192];
+const suportedPrimes: number[] = [1024, 1536, 2048, 3072, 4096, 6144, 8192];
 
 const suportedHashAlgorith: string[] = [
-    'SHA-1', // (not supported by Microsoft Edge)
-    'SHA-256',
-    'SHA-384',
-    'SHA-512'
+    "SHA-1", // (not supported by Microsoft Edge)
+    "SHA-256",
+    "SHA-384",
+    "SHA-512"
 ];
 
 export class Config {
@@ -13,11 +13,11 @@ export class Config {
 
     constructor(primeSize: number, hashAlgorithm: string) {
         if (!suportedPrimes.includes(primeSize)) {
-            throw new Error('Invalid prime size');
+            throw new Error("Invalid prime size");
         }
 
         if (!suportedHashAlgorith.includes(hashAlgorithm)) {
-            throw new Error('Invalid hashAlgorithm type');
+            throw new Error("Invalid hashAlgorithm type");
         }
 
         this.primeSize = primeSize;

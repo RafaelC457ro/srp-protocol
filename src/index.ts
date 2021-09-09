@@ -1,6 +1,5 @@
-import {Client} from './client';
-import {Config} from './config';
-import {Identity} from './identity';
-import {Server} from './server';
+import {Client} from "./Client";
+import {Config} from "./Config";
+import {Server} from "./Server";
 
-export {Client, Server, Identity, Config};
+export {Client, Server, Config};
